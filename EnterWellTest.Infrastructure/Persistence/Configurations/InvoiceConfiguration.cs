@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace EnterWellTest.Infrastructure.Persistence.Configurations
 {
-    public class UserClaimConfiguration : IEntityTypeConfiguration<UserClaim>
+    public class InvoiceConfiguration : IEntityTypeConfiguration<Invoice>
     {
-        public void Configure(EntityTypeBuilder<UserClaim> builder)
+        public void Configure(EntityTypeBuilder<Invoice> builder)
         {
-            //builder.HasNoKey();
+            builder.HasOne(p => p.User).WithMany(p => p.Invoices).HasForeignKey(p => p.UserId);
         }
     }
 }

@@ -13,6 +13,8 @@ namespace EnterWellTest.Infrastructure.Persistence
         public virtual DbSet<RoleClaim> RoleClaim => Set<RoleClaim>();
         public virtual DbSet<UserRole> UserRole => Set<UserRole>();
         public virtual DbSet<User> User => Set<User>();
+        public virtual DbSet<Invoice> Invoices => Set<Invoice>();
+        public virtual DbSet<InvoiceItem> InvoiceItems => Set<InvoiceItem>();
 
         public EnterWellTestDbContext(DbContextOptions<EnterWellTestDbContext> options)
             : base(options) { }

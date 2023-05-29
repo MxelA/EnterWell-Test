@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EnterWellTest.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(EnterWellTestDbContext))]
-    [Migration("20230529143746_Init")]
+    [Migration("20230529152137_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -23,6 +23,113 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("EnterWellTest.Domain.Entities.Invoice", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("Customer")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("customer");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<DateTimeOffset>("DueDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("due_date");
+
+                    b.Property<string>("InvoiceCode")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("invoice_code");
+
+                    b.Property<decimal>("PriceWithTax")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price_with_tax");
+
+                    b.Property<decimal>("PriceWithoutTax")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price_without_tax");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("integer")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_invoices");
+
+                    b.HasIndex("UserId")
+                        .HasDatabaseName("ix_invoices_user_id");
+
+                    b.ToTable("invoices", (string)null);
+                });
+
+            modelBuilder.Entity("EnterWellTest.Domain.Entities.InvoiceItem", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("deleted_at");
+
+                    b.Property<int>("InvoiceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("invoice_id");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.Property<decimal>("PriceWithTax")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price_with_tax");
+
+                    b.Property<decimal>("PriceWithoutTax")
+                        .HasColumnType("numeric")
+                        .HasColumnName("price_without_tax");
+
+                    b.Property<decimal>("Quantity")
+                        .HasColumnType("numeric")
+                        .HasColumnName("quantity");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_at");
+
+                    b.HasKey("Id")
+                        .HasName("pk_invoice_items");
+
+                    b.HasIndex("InvoiceId")
+                        .HasDatabaseName("ix_invoice_items_invoice_id");
+
+                    b.ToTable("invoice_items", (string)null);
+                });
 
             modelBuilder.Entity("EnterWellTest.Domain.Entities.Role", b =>
                 {
@@ -337,6 +444,30 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("EnterWellTest.Domain.Entities.Invoice", b =>
+                {
+                    b.HasOne("EnterWellTest.Domain.Entities.User", "User")
+                        .WithMany("Invoices")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_invoices_user_user_id");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("EnterWellTest.Domain.Entities.InvoiceItem", b =>
+                {
+                    b.HasOne("EnterWellTest.Domain.Entities.Invoice", "Invoice")
+                        .WithMany("InvoiceItems")
+                        .HasForeignKey("InvoiceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("fk_invoice_items_invoices_invoice_id");
+
+                    b.Navigation("Invoice");
+                });
+
             modelBuilder.Entity("EnterWellTest.Domain.Entities.RoleClaim", b =>
                 {
                     b.HasOne("EnterWellTest.Domain.Entities.Role", null)
@@ -436,6 +567,11 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("EnterWellTest.Domain.Entities.Invoice", b =>
+                {
+                    b.Navigation("InvoiceItems");
+                });
+
             modelBuilder.Entity("EnterWellTest.Domain.Entities.Role", b =>
                 {
                     b.Navigation("Claims");
@@ -446,6 +582,8 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
             modelBuilder.Entity("EnterWellTest.Domain.Entities.User", b =>
                 {
                     b.Navigation("Claims");
+
+                    b.Navigation("Invoices");
 
                     b.Navigation("Logins");
 

@@ -198,6 +198,59 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
                         principalColumn: "id");
                 });
 
+            migrationBuilder.CreateTable(
+                name: "invoices",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    user_id = table.Column<int>(type: "integer", nullable: false),
+                    invoice_code = table.Column<string>(type: "text", nullable: false),
+                    due_date = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    price_without_tax = table.Column<decimal>(type: "numeric", nullable: false),
+                    price_with_tax = table.Column<decimal>(type: "numeric", nullable: false),
+                    customer = table.Column<string>(type: "text", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_invoices", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_invoices_user_user_id",
+                        column: x => x.user_id,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "invoice_items",
+                columns: table => new
+                {
+                    id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    invoice_id = table.Column<int>(type: "integer", nullable: false),
+                    name = table.Column<string>(type: "text", nullable: false),
+                    quantity = table.Column<decimal>(type: "numeric", nullable: false),
+                    price_without_tax = table.Column<decimal>(type: "numeric", nullable: false),
+                    price_with_tax = table.Column<decimal>(type: "numeric", nullable: false),
+                    created_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    updated_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    deleted_at = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("pk_invoice_items", x => x.id);
+                    table.ForeignKey(
+                        name: "fk_invoice_items_invoices_invoice_id",
+                        column: x => x.invoice_id,
+                        principalTable: "invoices",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "ix_asp_net_role_claims_role_id",
                 table: "AspNetRoleClaims",
@@ -264,6 +317,16 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
                 name: "ix_asp_net_user_tokens_user_id1",
                 table: "AspNetUserTokens",
                 column: "user_id1");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_invoice_items_invoice_id",
+                table: "invoice_items",
+                column: "invoice_id");
+
+            migrationBuilder.CreateIndex(
+                name: "ix_invoices_user_id",
+                table: "invoices",
+                column: "user_id");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -284,7 +347,13 @@ namespace EnterWellTest.Infrastructure.Persistence.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "invoice_items");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "invoices");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
